@@ -1,29 +1,29 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, Text } from "react-native-web";
+import { View, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, Text } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RegisterComponent = ({ navigation }) => {
 
-    const [firstname, setFirstName] = useState('');
-    const [lastname, setLastName] = useState('');
-    const [username, setUsername] = useState('');
+    
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
 
     
 
     const navigateToLogin = () => {
-        navigation.navigate('Login');}
+        navigation.replace('Login');}
 
         const handleRegister = async () => {
 
             try {
-                const response = await fetch('http://localhost:8080/auth/register', {
+                const response = await fetch('http://localhost:3000/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({firstname, lastname, username, password}),
+                    body: JSON.stringify({name, email, password}),
                 });
                 const data = await response.json();
                 console.log("data: ", data)
@@ -51,16 +51,16 @@ const RegisterComponent = ({ navigation }) => {
     return (
         <ScrollView style={Styles.container}>
             <View style={Styles.input}>
-                <TextInput placeholder="Insert Firstname" value={firstname} onChangeText={(value) => setFirstName(value)}></TextInput>
+                <TextInput placeholder="Insert Firstname" value={name} onChangeText={(value) => setName(value)}/>
             </View>
-            <View style={Styles.input}>
+            {/* <View style={Styles.input}>
                 <TextInput placeholder="Insert Lastname" value={lastname} onChangeText={(value) => setLastName(value)}></TextInput>
+            </View> */}
+            <View style={Styles.input}>
+                <TextInput  placeholder="Insert email User" value={email} onChangeText={(value) => setEmail(value)}/>
             </View>
             <View style={Styles.input}>
-                <TextInput  placeholder="Insert name User" value={username} onChangeText={(value) => setUsername(value)}></TextInput>
-            </View>
-            <View style={Styles.input}>
-                <TextInput placeholder="Password" value={password} onChangeText={(value) => setPassword(value)} secureTextEntry></TextInput>
+                <TextInput placeholder="Password" value={password} onChangeText={(value) => setPassword(value)} secureTextEntry/>
             </View>
 
             <View>
