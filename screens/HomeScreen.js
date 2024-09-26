@@ -19,6 +19,9 @@ import { FAB } from 'react-native-paper'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Header from '../components/Header'
+import * as ImagePicker from 'expo-image-picker'
+import ButtonComponent from '../components/ButtonComponent'
+import ImageViewer from '../components/ImageViewer'
 
 function HomeComponent({ navigation }) {
   const [data, setData] = useState([])
@@ -29,6 +32,7 @@ function HomeComponent({ navigation }) {
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
   const [isOpen, setIsOpen] = useState(true)
+  const [selectedImage, setSelectedImage] = useState(null)
   const bottomSheetRef = useRef(BottomSheet)
   const insets = useSafeAreaInsets()
 
@@ -59,7 +63,7 @@ function HomeComponent({ navigation }) {
         mode: 'cors',
         cache: 'default',
       })
-      // console.log(token)
+      console.log(token)
       // console.log("response: ", response)
       const dataFetch = await response.json()
       setLoading(false)
@@ -72,6 +76,11 @@ function HomeComponent({ navigation }) {
   }
 
   const handleSubmit = async () => {
+    if (subject === '' || message === '') {
+      console.log('NO, ', photo, subject, message)
+      alert('Field Empty')
+      return
+    }
     try {
       const token = await AsyncStorage.getItem('token')
       console.log('token: ', token)
@@ -80,8 +89,8 @@ function HomeComponent({ navigation }) {
       //   setEmail(decodedToken)
 
       console.log('photo: ', photo)
-      console.log('subject: ', subject)
-      console.log('message: ', message)
+      console.log('subject: ', typeof subject)
+      console.log('message: ', typeof message)
 
       // const response = await fetch('http://localhost:3000/api/subjects', {
       const response = await fetch('http://192.168.1.97:3000/api/subjects', {
@@ -99,27 +108,32 @@ function HomeComponent({ navigation }) {
       setPhoto('')
       setSubject('')
       setMessage('')
-
+      setSelectedImage('')
     } catch (err) {
       console.log('Error al obtener datos del usuario', err)
+    }
+  }
+
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+      base64: false,
+    })
+
+    if (!result.canceled) {
+      // console.log(result.assets[0].uri);
+      setSelectedImage(result.assets[0].uri)
+      const uri = result.assets[0].uri
+      return setPhoto(uri.split('ImagePicker/')[1])
+    } else {
+      alert('You did not select any image.')
     }
   }
 
   useEffect(() => {
     fetchUserData()
   }, [])
-
-  const renderItem = ({ item }) => (
-    console.log('ITEM_>>>:', item.message),
-    (
-      <View style={styles.item}>
-        <Text style={styles.title}>{item.id}</Text>
-        <Text style={styles.title}>{item.message}</Text>
-        <Text style={styles.title}>{item.photo}</Text>
-        <Text style={styles.title}>{item.subject}</Text>
-      </View>
-    )
-  )
 
   if (loading) {
     return (
@@ -137,9 +151,11 @@ function HomeComponent({ navigation }) {
   return (
     <SafeAreaView
       style={
-        {
-          // marginTop: StatusBar.currentHeight
-        }
+        styles.container
+        // {
+
+        // marginTop: StatusBar.currentHeight
+        // }
       }
     >
       {/* <View> */}
@@ -186,7 +202,7 @@ function HomeComponent({ navigation }) {
           onPress={() => handleSnapPress(0)}
         />
       </View>
-      <View></View>
+
       <BottomSheet
         ref={bottomSheetRef}
         snapPoints={snapPoints}
@@ -197,12 +213,19 @@ function HomeComponent({ navigation }) {
       >
         <BottomSheetView style={styles.container}>
           {/* <Text>Awesome 🎉</Text> */}
-          <View style={styles.inputGroup}>
+          {/* <View style={styles.inputGroup}>
             <TextInput
               displayType="text"
               placeholder="Attached image"
               value={photo}
               onChangeText={(value) => setPhoto(value)}
+            />
+          </View> */}
+          <View>
+            <ButtonComponent
+              theme="primary"
+              label="Choose a photo"
+              onPress={pickImageAsync}
             />
           </View>
           <View style={styles.inputGroup}>
@@ -224,6 +247,13 @@ function HomeComponent({ navigation }) {
           <View>
             <Button title="Send subjects" onPress={handleSubmit} />
           </View>
+
+          <View style={styles.imageContainer}>
+            <ImageViewer
+              placeholderImageSource={"PlaceholderImage"}
+              selectedImage={selectedImage}
+            />
+          </View>
         </BottomSheetView>
       </BottomSheet>
     </SafeAreaView>
@@ -233,7 +263,7 @@ function HomeComponent({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
   },
   item: {
     backgroundColor: '#1e272e',
@@ -251,10 +281,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   fab: {
+    flex: 1,
+    flexDirection: 'row',
     position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 30,
+    bottom: 10,
+    alignSelf: 'flex-end',
+    justifyContent: 'space-between',
+    // backgroundColor: "transparent",
+    borderWidth: 0.5,
+    borderRadius: 20,
   },
   contentContainer: {
     flex: 1,
@@ -265,6 +300,10 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
     borderBottomWidth: 1,
+  },
+  imageContainer: {
+    flex:1, 
+    paddingTop: 10
   },
 })
 
