@@ -22,6 +22,7 @@ import Header from '../components/Header'
 import * as ImagePicker from 'expo-image-picker'
 import ButtonComponent from '../components/ButtonComponent'
 import ImageViewer from '../components/ImageViewer'
+import { IconButton, MD3Colors, Avatar, Card} from 'react-native-paper'
 
 function HomeComponent({ navigation }) {
   const [data, setData] = useState([])
@@ -114,6 +115,28 @@ function HomeComponent({ navigation }) {
     }
   }
 
+  const handleDelete = async (id) => {
+    try {
+      const token = await AsyncStorage.getItem('token')
+      console.log('token: ', token)
+
+      // const response = await fetch('http://localhost:3000/api/subjects', {
+      await fetch(`http://192.168.1.97:3000/api/subjects/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        mode: 'cors',
+        cache: 'default',
+      })
+
+      fetchUserData()
+    } catch (err) {
+      console.log('Error al obtener datos del usuario', err)
+    }
+  }
+
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -175,10 +198,21 @@ function HomeComponent({ navigation }) {
           renderItem={({ item }) => (
             //  {console.log("item: ____", item.photo)}
             <View style={styles.item}>
+              {/* <Text style={styles.title}>id: {item.id}</Text> */}
               <Text style={styles.title}>Title: {item.message}</Text>
               <Text style={styles.title}>Image: {item.photo}</Text>
               <Text style={styles.title}>Subject: {item.subject}</Text>
               <Text style={styles.title}>Time: {item.timeSubject}</Text>
+              <View>
+                <IconButton
+                  icon="delete"
+                  iconColor={MD3Colors.error50}
+                  size={20}
+                  onPress={() => handleDelete(item.id)}
+                />
+              </View>
+
+              
             </View>
           )}
         />
@@ -250,7 +284,7 @@ function HomeComponent({ navigation }) {
 
           <View style={styles.imageContainer}>
             <ImageViewer
-              placeholderImageSource={"PlaceholderImage"}
+              placeholderImageSource={'PlaceholderImage'}
               selectedImage={selectedImage}
             />
           </View>
@@ -302,8 +336,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   imageContainer: {
-    flex:1, 
-    paddingTop: 10
+    flex: 1,
+    paddingTop: 10,
   },
 })
 
