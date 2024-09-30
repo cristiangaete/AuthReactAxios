@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import {
-  Button,
+  // Button,
   Text,
   View,
   FlatList,
@@ -15,14 +15,15 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { jwtDecode } from 'jwt-decode'
-import { FAB } from 'react-native-paper'
+// import { FAB } from 'react-native-paper'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Header from '../components/Header'
 import * as ImagePicker from 'expo-image-picker'
 import ButtonComponent from '../components/ButtonComponent'
 import ImageViewer from '../components/ImageViewer'
-import { IconButton, MD3Colors, Avatar, Card} from 'react-native-paper'
+// import { IconButton, MD3Colors, Avatar, Card} from 'react-native-paper'
+import { FAB, Button, Icon, Card } from '@rneui/themed'
 
 function HomeComponent({ navigation }) {
   const [data, setData] = useState([])
@@ -197,21 +198,36 @@ function HomeComponent({ navigation }) {
           keyExtractor={(item) => item.id.toString()} // Asignamos una clave única para cada elemento
           renderItem={({ item }) => (
             //  {console.log("item: ____", item.photo)}
-            <View style={styles.item}>
+            // <View style={styles.item}>
+            <View>
               {/* <Text style={styles.title}>id: {item.id}</Text> */}
-              <Text style={styles.title}>Title: {item.message}</Text>
+              {/* <Text style={styles.title}>Title: {item.message}</Text>
               <Text style={styles.title}>Image: {item.photo}</Text>
               <Text style={styles.title}>Subject: {item.subject}</Text>
-              <Text style={styles.title}>Time: {item.timeSubject}</Text>
-              <View>
-                <IconButton
-                  icon="delete"
-                  iconColor={MD3Colors.error50}
-                  size={20}
+              <Text style={styles.title}>Time: {item.timeSubject}</Text> */}
+              
+              <Card>
+                <Card.Title>Title: {item.subject}</Card.Title>
+                <Card.Divider />
+                <Card.Image
+                  style={{ padding: 0 }}
+                  source={{
+                    uri: 'https://awildgeographer.files.wordpress.com/2015/02/john_muir_glacier.jpg',
+                  }}
+                />
+                <Text style={{ marginBottom: 10 }}>Photo Name: {item.photo}</Text>
+                <Text style={{ marginBottom: 10 }}>Message: {item.message}</Text>
+                <Text style={{ marginBottom: 10 }}>Time: {item.timeSubject}</Text>
+                <Card.Divider />
+                <Icon
+                style={{
+                  flexDirection: 'row',
+                }}
+                  name="delete"
+                  color="black"
                   onPress={() => handleDelete(item.id)}
                 />
-              </View>
-
+              </Card>
               
             </View>
           )}
@@ -230,10 +246,17 @@ function HomeComponent({ navigation }) {
             </ScrollView> */}
 
       <View>
-        <FAB
+        {/* <FAB
           icon="plus"
           style={styles.fab}
           onPress={() => handleSnapPress(0)}
+        /> */}
+
+        <FAB
+          onPress={() => handleSnapPress(0)}
+          placement="right"
+          icon={{ name: 'add', color: 'white' }}
+          color="#517fa4"
         />
       </View>
 

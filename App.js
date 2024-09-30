@@ -6,7 +6,6 @@ import HomeComponent from './screens/HomeScreen';
 import RegisterComponent from './screens/RegisterScreen';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Drawer } from 'react-native-paper';
 
 import { Button, Text, View} from 'react-native';
 import ProfileComponent from './screens/ProfileScreen';
