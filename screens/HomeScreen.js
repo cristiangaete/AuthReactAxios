@@ -12,6 +12,7 @@ import {
   Box,
   TouchableWithoutFeedback,
   TextInput,
+  Dimensions,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { jwtDecode } from 'jwt-decode'
@@ -30,13 +31,15 @@ function HomeComponent({ navigation }) {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(true)
   const [active, setActive] = useState('')
-  const [photo, setPhoto] = useState('')
+  const [photoName, setPhotoName] = useState('')
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
   const [isOpen, setIsOpen] = useState(true)
   const [selectedImage, setSelectedImage] = useState(null)
+  const [image, setImage] = useState(null)
   const bottomSheetRef = useRef(BottomSheet)
   const insets = useSafeAreaInsets()
+  const screenHeight = Dimensions.get('window').height
 
   const snapPoints = ['80%']
 
@@ -53,7 +56,6 @@ function HomeComponent({ navigation }) {
       //   console.log(decodedToken)
       setEmail(decodedToken)
 
-      //   console.log('EMAIL: ', email)
 
       // const response = await fetch('http://localhost:3000/api/subjects', {
       const response = await fetch('http://192.168.1.97:3000/api/subjects', {
@@ -66,10 +68,15 @@ function HomeComponent({ navigation }) {
         cache: 'default',
       })
       console.log(token)
+      console.log('screenHeight: ', screenHeight)
+      
+
+
       // console.log("response: ", response)
       const dataFetch = await response.json()
       setLoading(false)
       console.log(dataFetch.length)
+      console.log('dataFetch: ', dataFetch)
       // console.log("user------->", user.userEmail)
       setData(dataFetch)
     } catch (err) {
@@ -79,40 +86,56 @@ function HomeComponent({ navigation }) {
 
   const handleSubmit = async () => {
     if (subject === '' || message === '') {
-      console.log('NO, ', photo, subject, message)
+      console.log('NO, ', photoName, subject, message)
       alert('Field Empty')
       return
     }
+ 
     try {
       const token = await AsyncStorage.getItem('token')
       console.log('token: ', token)
       //   const decodedToken = jwtDecode(token)
       //   console.log(decodedToken)
-      //   setEmail(decodedToken)
+     
 
-      console.log('photo: ', photo)
-      console.log('subject: ', typeof subject)
-      console.log('message: ', typeof message)
+      const data = new FormData()
+     console.log(image)
+      data.append('photoName', photoName)
+      data.append('subject', subject)
+      data.append('message', message)
+      data.append('file', {
+        name: image.fileName,
+        uri: image.uri,
+        type: image.mimeType,
+      })
+      Object.values(data).forEach((value, key) => {
+        console.log(key, value)
+      });
 
       // const response = await fetch('http://localhost:3000/api/subjects', {
       const response = await fetch('http://192.168.1.97:3000/api/subjects', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          // 'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ photo, subject, message }),
+        // body: (data,{photoName, subject, message }),
+        body: data,
         mode: 'cors',
         cache: 'default',
       })
 
+      const result = await response.json()
+      console.log('Respuesta del servidor:', result)
+
       fetchUserData()
-      setPhoto('')
+      setPhotoName('')
       setSubject('')
       setMessage('')
       setSelectedImage('')
     } catch (err) {
-      console.log('Error al obtener datos del usuario', err)
+      console.log( err)
     }
   }
 
@@ -146,10 +169,11 @@ function HomeComponent({ navigation }) {
     })
 
     if (!result.canceled) {
-      // console.log(result.assets[0].uri);
+      console.log('fileee -->: ', result.assets[0])
       setSelectedImage(result.assets[0].uri)
-      const uri = result.assets[0].uri
-      return setPhoto(uri.split('ImagePicker/')[1])
+      setImage(result.assets[0])
+      setPhotoName(result.assets[0].fileName)
+      // setPhotoName(uri.split('ImagePicker/')[1])
     } else {
       alert('You did not select any image.')
     }
@@ -193,9 +217,9 @@ function HomeComponent({ navigation }) {
       {/* <ScrollView> */}
       <View>
         <FlatList
-          contentContainerStyle={{ paddingBottom: 50 }}
+          contentContainerStyle={{ minHeight: screenHeight }}
           data={data} // Pasamos los datos a la lista
-          keyExtractor={(item) => item.id.toString()} // Asignamos una clave única para cada elemento
+          keyExtractor={(item) => item.id.toString()} 
           renderItem={({ item }) => (
             //  {console.log("item: ____", item.photo)}
             // <View style={styles.item}>
@@ -205,30 +229,35 @@ function HomeComponent({ navigation }) {
               <Text style={styles.title}>Image: {item.photo}</Text>
               <Text style={styles.title}>Subject: {item.subject}</Text>
               <Text style={styles.title}>Time: {item.timeSubject}</Text> */}
-              
+
               <Card>
                 <Card.Title>Title: {item.subject}</Card.Title>
                 <Card.Divider />
                 <Card.Image
                   style={{ padding: 0 }}
                   source={{
-                    uri: 'https://awildgeographer.files.wordpress.com/2015/02/john_muir_glacier.jpg',
+                    uri: item.path,
                   }}
                 />
-                <Text style={{ marginBottom: 10 }}>Photo Name: {item.photo}</Text>
-                <Text style={{ marginBottom: 10 }}>Message: {item.message}</Text>
-                <Text style={{ marginBottom: 10 }}>Time: {item.timeSubject}</Text>
+                <Text style={{ marginBottom: 10 }}>
+                  Photo Name: {item.photoName}
+                </Text>
+                <Text style={{ marginBottom: 10 }}>
+                  Message: {item.message}
+                </Text>
+                <Text style={{ marginBottom: 10 }}>
+                  Time: {item.timeSubject}
+                </Text>
                 <Card.Divider />
                 <Icon
-                style={{
-                  flexDirection: 'row',
-                }}
+                  style={{
+                    flexDirection: 'row',
+                  }}
                   name="delete"
                   color="black"
                   onPress={() => handleDelete(item.id)}
                 />
               </Card>
-              
             </View>
           )}
         />
@@ -246,12 +275,6 @@ function HomeComponent({ navigation }) {
             </ScrollView> */}
 
       <View>
-        {/* <FAB
-          icon="plus"
-          style={styles.fab}
-          onPress={() => handleSnapPress(0)}
-        /> */}
-
         <FAB
           onPress={() => handleSnapPress(0)}
           placement="right"
