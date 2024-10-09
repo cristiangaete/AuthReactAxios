@@ -13,6 +13,9 @@ import {
   TouchableWithoutFeedback,
   TextInput,
   Dimensions,
+  Modal,
+  TouchableOpacity,
+  Image,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { jwtDecode } from 'jwt-decode'
@@ -23,8 +26,8 @@ import Header from '../components/Header'
 import * as ImagePicker from 'expo-image-picker'
 import ButtonComponent from '../components/ButtonComponent'
 import ImageViewer from '../components/ImageViewer'
-// import { IconButton, MD3Colors, Avatar, Card} from 'react-native-paper'
 import { FAB, Button, Icon, Card } from '@rneui/themed'
+import ImageView from 'react-native-image-viewing'
 
 function HomeComponent({ navigation }) {
   const [data, setData] = useState([])
@@ -41,6 +44,11 @@ function HomeComponent({ navigation }) {
   const insets = useSafeAreaInsets()
   const screenHeight = Dimensions.get('window').height
 
+  const [visible, setIsVisible] = useState(false)
+
+  const [isModalVisible, setModalVisible] = useState(false)
+  const [selecImage, setSelecImage] = useState(null)
+
   const snapPoints = ['80%']
 
   const handleSnapPress = useCallback((index) => {
@@ -56,7 +64,6 @@ function HomeComponent({ navigation }) {
       //   console.log(decodedToken)
       setEmail(decodedToken)
 
-
       // const response = await fetch('http://localhost:3000/api/subjects', {
       const response = await fetch('http://192.168.1.97:3000/api/subjects', {
         method: 'GET',
@@ -69,14 +76,14 @@ function HomeComponent({ navigation }) {
       })
       console.log(token)
       console.log('screenHeight: ', screenHeight)
-      
-
 
       // console.log("response: ", response)
       const dataFetch = await response.json()
       setLoading(false)
       console.log(dataFetch.length)
-      console.log('dataFetch: ', dataFetch)
+      console.log(dataFetch)
+    console.log("selecImage: ",selecImage)
+
       // console.log("user------->", user.userEmail)
       setData(dataFetch)
     } catch (err) {
@@ -90,16 +97,15 @@ function HomeComponent({ navigation }) {
       alert('Field Empty')
       return
     }
- 
+
     try {
       const token = await AsyncStorage.getItem('token')
       console.log('token: ', token)
       //   const decodedToken = jwtDecode(token)
       //   console.log(decodedToken)
-     
 
       const data = new FormData()
-     console.log(image)
+      console.log(image)
       data.append('photoName', photoName)
       data.append('subject', subject)
       data.append('message', message)
@@ -110,7 +116,7 @@ function HomeComponent({ navigation }) {
       })
       Object.values(data).forEach((value, key) => {
         console.log(key, value)
-      });
+      })
 
       // const response = await fetch('http://localhost:3000/api/subjects', {
       const response = await fetch('http://192.168.1.97:3000/api/subjects', {
@@ -135,7 +141,7 @@ function HomeComponent({ navigation }) {
       setMessage('')
       setSelectedImage('')
     } catch (err) {
-      console.log( err)
+      console.log(err)
     }
   }
 
@@ -196,6 +202,21 @@ function HomeComponent({ navigation }) {
     navigation.replace('Login')
   }
 
+  const openModal = (id,imageUrl) => {
+    console.log(imageUrl)
+    console.log(id)
+    setSelecImage(imageUrl)
+    setModalVisible(true)
+    // setSelecImage(null)
+
+  }
+
+  const closeModal = () => {
+    setSelecImage(null)
+    console.log("close")
+    setModalVisible(false)
+  }
+
   return (
     <SafeAreaView
       style={
@@ -219,26 +240,51 @@ function HomeComponent({ navigation }) {
         <FlatList
           contentContainerStyle={{ minHeight: screenHeight }}
           data={data} // Pasamos los datos a la lista
-          keyExtractor={(item) => item.id.toString()} 
+          keyExtractor={(item, index) => item.id.toString()}
           renderItem={({ item }) => (
             //  {console.log("item: ____", item.photo)}
             // <View style={styles.item}>
             <View>
-              {/* <Text style={styles.title}>id: {item.id}</Text> */}
-              {/* <Text style={styles.title}>Title: {item.message}</Text>
-              <Text style={styles.title}>Image: {item.photo}</Text>
-              <Text style={styles.title}>Subject: {item.subject}</Text>
-              <Text style={styles.title}>Time: {item.timeSubject}</Text> */}
-
               <Card>
                 <Card.Title>Title: {item.subject}</Card.Title>
                 <Card.Divider />
-                <Card.Image
-                  style={{ padding: 0 }}
-                  source={{
-                    uri: item.path,
-                  }}
-                />
+                <TouchableOpacity
+                  key={item.id}
+                  onPress={() => openModal(item.id, item.path)}
+                >
+                  <Card.Image
+                    style={{ padding: 0 }}
+                    source={{
+                      uri: item.path,
+                    }}
+                  />
+                </TouchableOpacity>
+                <Modal
+                  visible={isModalVisible}
+                  transparent={true}
+                  // onRequestClose={() => setModalVisible(false)}
+                >
+                  <View style={styles.modalContainer}>
+                    {selecImage  && (
+                      <Image
+                        source={{ uri: item.path }}
+                        style={styles.fullImage}
+                        resizeMode="contain"
+                      />
+                    )}
+                  
+                    {/* Botón de cerrar */}
+                    <TouchableOpacity
+                      onPress={closeModal}
+                      style={styles.closeButton}
+
+                    >
+                      <Text style={styles.closeButtonText}>{item.id}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </Modal>
+
+                <Text style={{ marginBottom: 10 }}>id: {item.id}</Text>
                 <Text style={{ marginBottom: 10 }}>
                   Photo Name: {item.photoName}
                 </Text>
@@ -262,17 +308,6 @@ function HomeComponent({ navigation }) {
           )}
         />
       </View>
-      {/* </ScrollView> */}
-      {/* <ScrollView >
-                {data.map((item) => (
-                    <View style={styles.item}>
-                    <Text style={styles.title}>{item.message}</Text>
-                    <Text style={styles.title}>{item.photo}</Text>
-                    <Text style={styles.title}>{item.subject}</Text>
-                    <Text style={styles.title}>{item.timeSubject}</Text>
-                    </View>
-                ))}
-            </ScrollView> */}
 
       <View>
         <FAB
@@ -292,15 +327,6 @@ function HomeComponent({ navigation }) {
         // onPress={handleClose}
       >
         <BottomSheetView style={styles.container}>
-          {/* <Text>Awesome 🎉</Text> */}
-          {/* <View style={styles.inputGroup}>
-            <TextInput
-              displayType="text"
-              placeholder="Attached image"
-              value={photo}
-              onChangeText={(value) => setPhoto(value)}
-            />
-          </View> */}
           <View>
             <ButtonComponent
               theme="primary"
@@ -384,6 +410,32 @@ const styles = StyleSheet.create({
   imageContainer: {
     flex: 1,
     paddingTop: 10,
+  },
+  fullImage: {
+    width: '100%',
+    height: '80%',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)', // Fondo oscuro semitransparente
+  },
+  closeButton: {
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'black',
+    fontSize: 16,
+  },
+  imageThumbnail: {
+    width: 100,
+    height: 100,
+    margin: 5,
   },
 })
 
