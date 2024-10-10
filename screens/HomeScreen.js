@@ -47,7 +47,7 @@ function HomeComponent({ navigation }) {
   const [visible, setIsVisible] = useState(false)
 
   const [isModalVisible, setModalVisible] = useState(false)
-  const [selecImage, setSelecImage] = useState(null)
+  const [imageModal, setImageModal] = useState(null)
 
   const snapPoints = ['80%']
 
@@ -82,7 +82,6 @@ function HomeComponent({ navigation }) {
       setLoading(false)
       console.log(dataFetch.length)
       console.log(dataFetch)
-    console.log("selecImage: ",selecImage)
 
       // console.log("user------->", user.userEmail)
       setData(dataFetch)
@@ -202,19 +201,11 @@ function HomeComponent({ navigation }) {
     navigation.replace('Login')
   }
 
-  const openModal = (id,imageUrl) => {
+  const toggleModal = (imageUrl) => {
+    // setModalVisible(!isModalVisible)
     console.log(imageUrl)
-    console.log(id)
-    setSelecImage(imageUrl)
+    setImageModal(imageUrl)
     setModalVisible(true)
-    // setSelecImage(null)
-
-  }
-
-  const closeModal = () => {
-    setSelecImage(null)
-    console.log("close")
-    setModalVisible(false)
   }
 
   return (
@@ -227,20 +218,12 @@ function HomeComponent({ navigation }) {
         // }
       }
     >
-      {/* <View> */}
-      {/* <Header title={"Home"}/> */}
-      {/* </View> */}
-
       {email ? <Text>Welcome, {email.email}</Text> : <Text>Cargando...</Text>}
-      {/* <View>
-                <Button title="Logout" onPress={handleLogout} />
-            </View> */}
-      {/* <ScrollView> */}
       <View>
         <FlatList
           contentContainerStyle={{ minHeight: screenHeight }}
           data={data} // Pasamos los datos a la lista
-          keyExtractor={(item, index) => item.id.toString()}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             //  {console.log("item: ____", item.photo)}
             // <View style={styles.item}>
@@ -250,7 +233,7 @@ function HomeComponent({ navigation }) {
                 <Card.Divider />
                 <TouchableOpacity
                   key={item.id}
-                  onPress={() => openModal(item.id, item.path)}
+                  onPress={() => toggleModal(item.path)}
                 >
                   <Card.Image
                     style={{ padding: 0 }}
@@ -262,29 +245,28 @@ function HomeComponent({ navigation }) {
                 <Modal
                   visible={isModalVisible}
                   transparent={true}
-                  // onRequestClose={() => setModalVisible(false)}
+                  onRequestClose={toggleModal}
                 >
                   <View style={styles.modalContainer}>
-                    {selecImage  && (
+                    {/* Imagen en pantalla completa */}
+                    {imageModal && (
                       <Image
-                        source={{ uri: item.path }}
+                        source={{ uri: imageModal }}
                         style={styles.fullImage}
                         resizeMode="contain"
                       />
                     )}
-                  
+
                     {/* Botón de cerrar */}
                     <TouchableOpacity
-                      onPress={closeModal}
+                      onPress={() => setModalVisible(false)}
                       style={styles.closeButton}
-
                     >
-                      <Text style={styles.closeButtonText}>{item.id}</Text>
+                      <Text style={styles.closeButtonText}>Close</Text>
                     </TouchableOpacity>
                   </View>
                 </Modal>
 
-                <Text style={{ marginBottom: 10 }}>id: {item.id}</Text>
                 <Text style={{ marginBottom: 10 }}>
                   Photo Name: {item.photoName}
                 </Text>
@@ -431,11 +413,6 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: 'black',
     fontSize: 16,
-  },
-  imageThumbnail: {
-    width: 100,
-    height: 100,
-    margin: 5,
   },
 })
 
