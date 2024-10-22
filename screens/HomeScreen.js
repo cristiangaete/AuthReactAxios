@@ -29,7 +29,7 @@ import ImageViewer from '../components/ImageViewer'
 import { FAB, Button, Icon, Card } from '@rneui/themed'
 import ImageView from 'react-native-image-viewing'
 
-function HomeComponent({ navigation }) {
+function HomeUserComponent({ navigation }) {
   const [data, setData] = useState([])
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(true)
@@ -258,6 +258,7 @@ function HomeComponent({ navigation }) {
                     )}
 
                     {/* Botón de cerrar */}
+                    
                     <TouchableOpacity
                       onPress={() => setModalVisible(false)}
                       style={styles.closeButton}
@@ -416,4 +417,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default HomeComponent
+export default HomeUserComponent
