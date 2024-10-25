@@ -78,6 +78,7 @@ export default function AdminHomeScreen() {
       }
       return item
     })
+    console.log(updatedItems)
     setData(updatedItems)
   }
   useEffect(() => {
@@ -110,12 +111,12 @@ export default function AdminHomeScreen() {
                 <Card.Divider />
                 <TouchableOpacity
                   key={item.id}
-                  onPress={() => toggleModal(item.path)}
+                  onPress={() => toggleModal(item.imageUser)}
                 >
                   <Card.Image
                     style={{ padding: 0 }}
                     source={{
-                      uri: item.path,
+                      uri: item.imageUser,
                     }}
                   />
                 </TouchableOpacity>

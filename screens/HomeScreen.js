@@ -233,12 +233,12 @@ function HomeUserComponent({ navigation }) {
                 <Card.Divider />
                 <TouchableOpacity
                   key={item.id}
-                  onPress={() => toggleModal(item.path)}
+                  onPress={() => toggleModal(item.imageUser)}
                 >
                   <Card.Image
                     style={{ padding: 0 }}
                     source={{
-                      uri: item.path,
+                      uri: item.imageUser,
                     }}
                   />
                 </TouchableOpacity>
