@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import {
   // Button,
   Text,
@@ -6,11 +6,7 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
-  StatusBar,
   SafeAreaView,
-  ScrollView,
-  Box,
-  TouchableWithoutFeedback,
   TextInput,
   Dimensions,
   Modal,
@@ -19,15 +15,13 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { jwtDecode } from 'jwt-decode'
-// import { FAB } from 'react-native-paper'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import Header from '../components/Header'
 import * as ImagePicker from 'expo-image-picker'
 import ButtonComponent from '../components/ButtonComponent'
 import ImageViewer from '../components/ImageViewer'
 import { FAB, Button, Icon, Card } from '@rneui/themed'
-import ImageView from 'react-native-image-viewing'
+
 
 function HomeUserComponent({ navigation }) {
   const [data, setData] = useState([])
@@ -65,7 +59,7 @@ function HomeUserComponent({ navigation }) {
       setEmail(decodedToken)
 
       // const response = await fetch('http://localhost:3000/api/subjects', {
-      const response = await fetch('http://192.168.1.97:3000/api/subjects', {
+      const response = await fetch('http://192.168.1.104:3000/api/subjects', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +112,7 @@ function HomeUserComponent({ navigation }) {
       })
 
       // const response = await fetch('http://localhost:3000/api/subjects', {
-      const response = await fetch('http://192.168.1.97:3000/api/subjects', {
+      const response = await fetch('http://192.168.1.104:3000/api/subjects', {
         method: 'POST',
         headers: {
           // 'Content-Type': 'application/json',
@@ -150,7 +144,7 @@ function HomeUserComponent({ navigation }) {
       console.log('token: ', token)
 
       // const response = await fetch('http://localhost:3000/api/subjects', {
-      await fetch(`http://192.168.1.97:3000/api/subjects/${id}`, {
+      await fetch(`http://192.168.1.104:3000/api/subjects/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -255,10 +249,11 @@ function HomeUserComponent({ navigation }) {
                         style={styles.fullImage}
                         resizeMode="contain"
                       />
+                    
                     )}
 
                     {/* Botón de cerrar */}
-                    
+
                     <TouchableOpacity
                       onPress={() => setModalVisible(false)}
                       style={styles.closeButton}
@@ -278,14 +273,13 @@ function HomeUserComponent({ navigation }) {
                   Time: {item.timeSubject}
                 </Text>
                 <Card.Divider />
+                <View style={{flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start',flexDirection: 'row',}}>
                 <Icon
-                  style={{
-                    flexDirection: 'row',
-                  }}
                   name="delete"
                   color="black"
                   onPress={() => handleDelete(item.id)}
                 />
+                </View>
               </Card>
             </View>
           )}
