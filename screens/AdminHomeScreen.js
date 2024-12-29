@@ -18,7 +18,12 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { jwtDecode } from 'jwt-decode'
-import { FAB, Icon, Card, CheckBox } from '@rneui/themed'
+import { Button, Icon, Card, CheckBox } from '@rneui/themed'
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
+import ButtonComponent from '../components/ButtonComponent'
+import ImageViewer from '../components/ImageViewer'
+
+
 
 export default function AdminHomeScreen() {
   const screenHeight = Dimensions.get('window').height
@@ -27,17 +32,27 @@ export default function AdminHomeScreen() {
   const [imageModal, setImageModal] = useState(null)
   const [email, setEmail] = useState('')
 
+  const snapPoints = ['80%']
+  const bottomSheetRef = useRef(BottomSheet)
 
 
-  const [checked, setChecked] = useState(false)
+  const [checked, setChecked] = useState(!false)
   const toggleCheckbox = () => setChecked(!checked)
+  const [subject, setSubject] = useState('')
+  const [message, setMessage] = useState('')
+const [selectedImage, setSelectedImage] = useState(null)
+const [isOpen, setIsOpen] = useState(true)
+
+
+
+
 
   const fetchUserData = async () => {
     try {
       const token = await AsyncStorage.getItem('token')
       const decodedToken = jwtDecode(token)
       console.log(decodedToken)
-        setEmail(decodedToken)
+      setEmail(decodedToken)
 
       // const response = await fetch('http://localhost:3000/api/subjects', {
       const response = await fetch('http://192.168.1.104:3000/api/subjects', {
@@ -71,6 +86,7 @@ export default function AdminHomeScreen() {
     setModalVisible(true)
   }
 
+
   const toggleChecked = (id) => {
     const updatedItems = data.map((item) => {
       if (item.id === id) {
@@ -79,8 +95,37 @@ export default function AdminHomeScreen() {
       return item
     })
     console.log(updatedItems)
+    console.log(checked)
     setData(updatedItems)
+    handleSnapPress(0);
+
+  
   }
+  const handleSnapPress = useCallback((index) => {
+    bottomSheetRef.current?.snapToIndex(index)
+    setIsOpen(true)
+  }, [])
+
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+      base64: false,
+    })
+
+    if (!result.canceled) {
+      console.log('fileee -->: ', result.assets[0])
+      setSelectedImage(result.assets[0].uri)
+      setImage(result.assets[0])
+      setPhotoName(result.assets[0].fileName)
+      // setPhotoName(uri.split('ImagePicker/')[1])
+    } else {
+      alert('You did not select any image.')
+    }
+  }
+
+
+
   useEffect(() => {
     fetchUserData()
   }, [])
@@ -95,7 +140,11 @@ export default function AdminHomeScreen() {
         // }
       }
     >
-    {email ? <Text>Welcome panel admin, {email.email} </Text> : <Text>Cargando...</Text>}
+      {email ? (
+        <Text>Welcome panel admin, {email.email} </Text>
+      ) : (
+        <Text>Cargando...</Text>
+      )}
 
       <View>
         <FlatList
@@ -167,20 +216,86 @@ export default function AdminHomeScreen() {
                   color="black"
                   onPress={() => handleDelete(item.id)}
                 /> */}
-                <CheckBox
-                  checked={item.isResolved}
-                  onPress={() => toggleChecked(item.id)}
-                  iconType="material-community"
-                  checkedIcon="checkbox-outline"
-                  uncheckedIcon={'checkbox-blank-outline'}
-                  size={22}
-                  right={true}
-                />
+               
+                  <CheckBox
+                    checked={item.isResolved}
+                    onPress={() => toggleChecked(item.id)}
+                    // onPress={() => handlePress(item.id)}
+                    iconType="material-community"
+                    checkedIcon="checkbox-outline"
+                    uncheckedIcon={'checkbox-blank-outline'}
+                    size={22}
+                    right={true}
+                    value={checked}
+                  onValueChange={setChecked}
+                  />
+
+                  {/* <Button
+                    title="Update request"
+                    onPress={() => handleSnapPress(0)}
+                    buttonStyle={{
+                      backgroundColor: 'rgba(90, 154, 230, 1)',
+                      borderWidth: 2,
+                      borderColor: 'white',
+                      borderRadius: 30,
+                    }}
+                    containerStyle={{
+                      width: 100,
+                      marginHorizontal: 50,
+                      marginVertical: 10,
+                    }}
+                    titleStyle={{ fontWeight: 'bold' }}
+                  /> */}
+                
               </Card>
             </View>
           )}
         />
       </View>
+      <BottomSheet
+        ref={bottomSheetRef}
+        snapPoints={snapPoints}
+        enablePanDownToClose={true}
+        index={-1}
+        // onClose={() => setIsOpen(false)}
+        // onPress={handleClose}
+      >
+        <BottomSheetView style={styles.container}>
+          <View>
+            <ButtonComponent
+              theme="primary"
+              label="Choose a photo"
+              onPress={pickImageAsync}
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <TextInput
+              displayType="text"
+              placeholder="Subject"
+              value={subject}
+              onChangeText={(value) => setSubject(value)}
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <TextInput
+              displayType="text"
+              placeholder="Message"
+              value={message}
+              onChangeText={(value) => setMessage(value)}
+            />
+          </View>
+          <View>
+            <Button title="Send subjects" onPress />
+          </View>
+
+          <View style={styles.imageContainer}>
+            <ImageViewer
+              placeholderImageSource={'PlaceholderImage'}
+              selectedImage={selectedImage}
+            />
+          </View>
+        </BottomSheetView>
+      </BottomSheet>
     </SafeAreaView>
   )
 }

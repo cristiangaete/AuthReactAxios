@@ -31,7 +31,7 @@ const ProfileComponent = () => {
 
       // const response = await fetch('http://localhost:3000/api/subjects', {
       const response = await fetch(
-        'http://192.168.1.97:3000/api/auth/profile',
+        'http://192.168.1.104:3000/api/auth/profile',
         {
           method: 'GET',
           headers: {

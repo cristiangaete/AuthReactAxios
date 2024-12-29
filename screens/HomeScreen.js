@@ -286,6 +286,7 @@ function HomeUserComponent({ navigation }) {
         />
       </View>
 
+          {/* BOTON DE ABRIR EL MODAL PARA CARGAR IMAGENES */}
       <View>
         <FAB
           onPress={() => handleSnapPress(0)}
@@ -294,7 +295,9 @@ function HomeUserComponent({ navigation }) {
           color="#517fa4"
         />
       </View>
-
+        
+          {/* ACA SE ABRE EL MODAL PARA CARGAR IMAGENES */}
+        
       <BottomSheet
         ref={bottomSheetRef}
         snapPoints={snapPoints}
