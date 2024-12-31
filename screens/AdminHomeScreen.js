@@ -22,8 +22,7 @@ import { Button, Icon, Card, CheckBox } from '@rneui/themed'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import ButtonComponent from '../components/ButtonComponent'
 import ImageViewer from '../components/ImageViewer'
-
-
+import * as ImagePicker from 'expo-image-picker'
 
 export default function AdminHomeScreen() {
   const screenHeight = Dimensions.get('window').height
@@ -35,17 +34,16 @@ export default function AdminHomeScreen() {
   const snapPoints = ['80%']
   const bottomSheetRef = useRef(BottomSheet)
 
-
   const [checked, setChecked] = useState(!false)
   const toggleCheckbox = () => setChecked(!checked)
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
-const [selectedImage, setSelectedImage] = useState(null)
-const [isOpen, setIsOpen] = useState(true)
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [isOpen, setIsOpen] = useState(true)
+  const [image, setImage] = useState(null)
+  const [photoName, setPhotoName] = useState('')
 
-
-
-
+  let selectedId = null
 
   const fetchUserData = async () => {
     try {
@@ -86,20 +84,32 @@ const [isOpen, setIsOpen] = useState(true)
     setModalVisible(true)
   }
 
-
   const toggleChecked = (id) => {
     const updatedItems = data.map((item) => {
+      console.log(item.id)
       if (item.id === id) {
+        selectedId = item.id
         return { ...item, isResolved: !item.isResolved }
+
+        // item.isResolved = !item.isResolved
+        // setChecked(item.isResolved)
       }
+      console.log(selectedId)
+
       return item
     })
-    console.log(updatedItems)
-    console.log(checked)
-    setData(updatedItems)
-    handleSnapPress(0);
 
-  
+    if (selectedId !== null) {
+      console.log(`Selected ID is: ${selectedId}`)
+    } else {
+      console.log('No ID selected yet.')
+    }
+
+    console.log(updatedItems)
+    console.log('ID:    ', selectedId)
+
+    setData(updatedItems)
+    handleSnapPress(0)
   }
   const handleSnapPress = useCallback((index) => {
     bottomSheetRef.current?.snapToIndex(index)
@@ -124,7 +134,53 @@ const [isOpen, setIsOpen] = useState(true)
     }
   }
 
+  const handleUpdate = async (id) => {
+    // try {
+      const token = await AsyncStorage.getItem('token')
+      console.log('token: ', token)
+      console.log("IDDDD: ", selectedId)
 
+      const data = new FormData()
+      // console.log(image)
+      // data.append('photoName', photoName)
+      data.append('isResolved', true)
+      data.append('fileAdmin', {
+        name: image.fileName,
+        uri: image.uri,
+        type: image.mimeType,
+      })
+      Object.values(data).forEach((value, key) => {
+        console.log("ACA PARTEEEEE")
+        console.log(key, value)
+      })
+
+      // const response = await fetch('http://localhost:3000/api/subjects', {
+      const response = await fetch(
+        `http://192.168.1.104:3000/api/subjects/${id}`,
+        {
+          method: 'PATCH',
+          headers: {
+            // 'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+          body: data,
+          mode: 'cors',
+          cache: 'default',
+        }
+      )
+      console.log(id)
+
+      const result = await response.json()
+      console.log('Respuesta del servidor:', result)
+
+      fetchUserData()
+
+      setSelectedImage('')
+    // } catch (err) {
+    //   console.log(err)
+    // }
+  }
 
   useEffect(() => {
     fetchUserData()
@@ -208,16 +264,7 @@ const [isOpen, setIsOpen] = useState(true)
                   Time: {item.timeSubject}
                 </Text>
                 <Card.Divider />
-                {/* <Icon
-                  style={{
-                    flexDirection: 'row',
-                  }}
-                  name="delete"
-                  color="black"
-                  onPress={() => handleDelete(item.id)}
-                /> */}
-               
-                  <CheckBox
+                {/* <CheckBox
                     checked={item.isResolved}
                     onPress={() => toggleChecked(item.id)}
                     // onPress={() => handlePress(item.id)}
@@ -226,13 +273,20 @@ const [isOpen, setIsOpen] = useState(true)
                     uncheckedIcon={'checkbox-blank-outline'}
                     size={22}
                     right={true}
-                    value={checked}
-                  onValueChange={setChecked}
-                  />
-
-                  {/* <Button
+                    // value={checked}
+                    // onValueChange={setChecked}
+                  /> */}
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'flex-start',
+                    alignItems: 'flex-start',
+                    flexDirection: 'row',
+                  }}
+                >
+                  <Button
                     title="Update request"
-                    onPress={() => handleSnapPress(0)}
+                    onPress={() => toggleChecked(item.id)}
                     buttonStyle={{
                       backgroundColor: 'rgba(90, 154, 230, 1)',
                       borderWidth: 2,
@@ -243,10 +297,11 @@ const [isOpen, setIsOpen] = useState(true)
                       width: 100,
                       marginHorizontal: 50,
                       marginVertical: 10,
+                      marginLeft: 5,
                     }}
                     titleStyle={{ fontWeight: 'bold' }}
-                  /> */}
-                
+                  />
+                </View>
               </Card>
             </View>
           )}
@@ -257,8 +312,6 @@ const [isOpen, setIsOpen] = useState(true)
         snapPoints={snapPoints}
         enablePanDownToClose={true}
         index={-1}
-        // onClose={() => setIsOpen(false)}
-        // onPress={handleClose}
       >
         <BottomSheetView style={styles.container}>
           <View>
@@ -268,24 +321,20 @@ const [isOpen, setIsOpen] = useState(true)
               onPress={pickImageAsync}
             />
           </View>
-          <View style={styles.inputGroup}>
+          {/* <View style={styles.inputGroup}>
             <TextInput
               displayType="text"
               placeholder="Subject"
               value={subject}
               onChangeText={(value) => setSubject(value)}
             />
-          </View>
-          <View style={styles.inputGroup}>
-            <TextInput
-              displayType="text"
-              placeholder="Message"
-              value={message}
-              onChangeText={(value) => setMessage(value)}
-            />
-          </View>
+          </View> */}
+
           <View>
-            <Button title="Send subjects" onPress />
+            <Button
+              title="Send subjects"
+              onPress={() => handleUpdate(selectedId)}
+            />
           </View>
 
           <View style={styles.imageContainer}>
