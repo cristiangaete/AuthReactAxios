@@ -42,8 +42,9 @@ export default function AdminHomeScreen() {
   const [isOpen, setIsOpen] = useState(true)
   const [image, setImage] = useState(null)
   const [photoName, setPhotoName] = useState('')
+  const [selectedId, setSelectedId] = useState(null);
 
-  let selectedId = null
+  let selectedId2 = null
 
   const fetchUserData = async () => {
     try {
@@ -88,7 +89,8 @@ export default function AdminHomeScreen() {
     const updatedItems = data.map((item) => {
       console.log(item.id)
       if (item.id === id) {
-        selectedId = item.id
+        // selectedId = item.id
+        setSelectedId(item.id);
         return { ...item, isResolved: !item.isResolved }
 
         // item.isResolved = !item.isResolved
@@ -133,6 +135,10 @@ export default function AdminHomeScreen() {
       alert('You did not select any image.')
     }
   }
+
+  const handleSelectId = (id) => {
+    setSelectedId(id); // Almacenas el ID en el estado
+  };
 
   const handleUpdate = async (id) => {
     // try {
@@ -329,6 +335,9 @@ export default function AdminHomeScreen() {
               onChangeText={(value) => setSubject(value)}
             />
           </View> */}
+          <View>
+              <Text> TEXTOID: {selectedId}</Text>
+          </View>
 
           <View>
             <Button

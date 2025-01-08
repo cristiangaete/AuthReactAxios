@@ -27,23 +27,9 @@ const MyDrawer = ({ navigation }) => {
   }
   return (
     <Drawerr.Navigator
-    // drawerContent={
-    //   () =>
-    //     <Drawer.CollapsedItem
-    //       focusedIcon="inbox"
-    //       unfocusedIcon="inbox-outline"
-    //       label="Inbox"
-    //     />
-    // }
+ 
     >
-      {/* screenOptions={{swipeEnabled: true, headerShown: true }} */}
-
-      {/* <Drawer.Screen name='Register' component={RegisterComponent} options={{
-        title: 'Register',
-        headerShown: true,
-        headerLeft: false,
-      }}
-      />  */}
+     
       <Drawerr.Screen
         name="Home"
         component={HomeUserComponent}
