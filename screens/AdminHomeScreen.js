@@ -37,7 +37,7 @@ export default function AdminHomeScreen() {
   const [checked, setChecked] = useState(!false)
   const toggleCheckbox = () => setChecked(!checked)
   const [subject, setSubject] = useState('')
-  const [message, setMessage] = useState('')
+  const [messageAdmin, setMessageAdmin] = useState('')
   const [selectedImage, setSelectedImage] = useState(null)
   const [isOpen, setIsOpen] = useState(true)
   const [image, setImage] = useState(null)
@@ -147,8 +147,8 @@ export default function AdminHomeScreen() {
       console.log("IDDDD: ", selectedId)
 
       const data = new FormData()
-      // console.log(image)
-      // data.append('photoName', photoName)
+      console.log(messageAdmin)
+      data.append('messageAdmin', messageAdmin)
       data.append('isResolved', true)
       data.append('fileAdmin', {
         name: image.fileName,
@@ -327,16 +327,17 @@ export default function AdminHomeScreen() {
               onPress={pickImageAsync}
             />
           </View>
-          {/* <View style={styles.inputGroup}>
+          <View style={styles.inputGroup}>
             <TextInput
               displayType="text"
-              placeholder="Subject"
-              value={subject}
-              onChangeText={(value) => setSubject(value)}
+              placeholder="Message Admin"
+              value={messageAdmin}
+              onChangeText={(value) => setMessageAdmin(value)}
             />
-          </View> */}
+          </View>
           <View>
               <Text> TEXTOID: {selectedId}</Text>
+              
           </View>
 
           <View>
