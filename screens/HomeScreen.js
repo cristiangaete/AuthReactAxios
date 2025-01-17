@@ -23,7 +23,7 @@ import ImageViewer from '../components/ImageViewer'
 import { FAB, Button, Icon, Card } from '@rneui/themed'
 
 
-function HomeUserComponent({ navigation }) {
+function HomeUserComponent() {
   const [data, setData] = useState([])
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(true)

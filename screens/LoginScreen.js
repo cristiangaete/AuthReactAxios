@@ -40,7 +40,7 @@ const LoginComponent = ({ navigation }) => {
   
       }
       else{
-        navigation.navigate('Home');
+        navigation.replace('Home');
       }
       // if (data !== 'Unauthorized') {
       //   await AsyncStorage.setItem('token', token)
