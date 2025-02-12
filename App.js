@@ -3,19 +3,17 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import LoginComponent from './screens/LoginScreen'
 import HomeUserComponent from './screens/HomeScreen'
 import RegisterComponent from './screens/RegisterScreen'
-import {
-  createDrawerNavigator,
-  DrawerContentScrollView,
-  DrawerItemList,
-  DrawerItem,
-} from '@react-navigation/drawer'
+import { createDrawerNavigator } from '@react-navigation/drawer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import FontAwesome from '@expo/vector-icons/FontAwesome'
 
-import { Button, StyleSheet, View, Dimensions } from 'react-native'
+import { Button, StyleSheet, Dimensions } from 'react-native'
 import ProfileComponent from './screens/ProfileScreen'
 import AdminHomeScreen from './screens/AdminHomeScreen'
 import CustomDrawer from './components/CustomDrawer'
 import { Ionicons } from '@expo/vector-icons'
+import ApplicationsReadyScreen from './screens/ApplicationsReadyScreen'
+import { View } from 'react-native'
 
 const Stack = createNativeStackNavigator()
 const Drawerr = createDrawerNavigator()
@@ -25,11 +23,9 @@ const MyDrawer = ({ navigation }) => {
     await AsyncStorage.removeItem('token')
     navigation.replace('Login')
   }
+
   return (
-    <Drawerr.Navigator
- 
-    >
-     
+    <Drawerr.Navigator>
       <Drawerr.Screen
         name="Home"
         component={HomeUserComponent}
@@ -62,7 +58,7 @@ const MyDrawerAdmin = ({ navigation }) => {
   }
   return (
     <Drawerr.Navigator
-    screenOptions={{drawerLabelStyle:{marginLeft:-25}}}
+      screenOptions={{ drawerLabelStyle: { marginLeft: -25 } }}
       // drawerContent={(props) => (
       //   <DrawerContentScrollView {...props}>
       //     <DrawerItemList {...props} />
@@ -73,7 +69,7 @@ const MyDrawerAdmin = ({ navigation }) => {
       //     </View>
       //   </DrawerContentScrollView>
       // )}
-      drawerContent={(props) => <CustomDrawer {...props}  />}
+      drawerContent={(props) => <CustomDrawer {...props} />}
     >
       {/* <Drawer.Screen name='Register' component={RegisterComponent} options={{
         title: 'Register',
@@ -89,10 +85,26 @@ const MyDrawerAdmin = ({ navigation }) => {
           headerShown: true,
           headerRight: () => (
             <Button onPress={handleLogout} title="Logout" color="purple" />
+
           ),
-          drawerIcon: ({color})=> (
-            <Ionicons name='home-outline' size={22} color={color}/>
-          )
+          drawerIcon: ({ color }) => (
+            <Ionicons name="home-outline" size={22} color={color} />
+          ),
+        }}
+      />
+
+      <Drawerr.Screen
+        name="Applications Ready"
+        component={ApplicationsReadyScreen}
+        options={{
+          // title: 'Register',
+          headerShown: true,
+          // headerRight: () => (
+          //   <Button onPress={handleLogout} title="Logout" color="purple" />
+          // ),
+          drawerIcon: ({ color }) => (
+            <Ionicons name="checkmark-circle-outline" size={22} color={color} />
+          ),
         }}
       />
     </Drawerr.Navigator>
@@ -120,7 +132,7 @@ function MyStack() {
       <Stack.Screen
         name="AdminHome"
         component={MyDrawerAdmin}
-        options={{ headerShown: false}}
+        options={{ headerShown: false }}
       />
 
       {/* <Stack.Screen  name='Home' component={HomeComponent} options={{title: 'Home', headerShown: false }}/> */}

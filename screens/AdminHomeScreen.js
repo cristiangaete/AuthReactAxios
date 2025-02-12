@@ -120,6 +120,7 @@ export default function AdminHomeScreen() {
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
       allowsEditing: true,
       quality: 1,
       base64: false,
@@ -181,7 +182,7 @@ export default function AdminHomeScreen() {
       console.log('Respuesta del servidor:', result)
 
       fetchUserData()
-
+      setMessageAdmin('')
       setSelectedImage('')
     // } catch (err) {
     //   console.log(err)

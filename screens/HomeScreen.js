@@ -15,12 +15,14 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { jwtDecode } from 'jwt-decode'
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import * as ImagePicker from 'expo-image-picker'
 import ButtonComponent from '../components/ButtonComponent'
 import ImageViewer from '../components/ImageViewer'
 import { FAB, Button, Icon, Card } from '@rneui/themed'
+
 
 
 function HomeUserComponent() {
@@ -37,6 +39,7 @@ function HomeUserComponent() {
   const bottomSheetRef = useRef(BottomSheet)
   const insets = useSafeAreaInsets()
   const screenHeight = Dimensions.get('window').height
+ 
 
   const [visible, setIsVisible] = useState(false)
 
@@ -162,6 +165,7 @@ function HomeUserComponent() {
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
       allowsEditing: true,
       quality: 1,
       base64: false,
@@ -202,147 +206,164 @@ function HomeUserComponent() {
     setModalVisible(true)
   }
 
+
+
   return (
-    <SafeAreaView
-      style={
-        styles.container
-        // {
+    <>
+        <GestureHandlerRootView >
 
-        // marginTop: StatusBar.currentHeight
-        // }
-      }
-    >
-      {email ? <Text>Welcome, {email.email}</Text> : <Text>Cargando...</Text>}
-      <View>
-        <FlatList
-          contentContainerStyle={{ minHeight: screenHeight }}
-          data={data} // Pasamos los datos a la lista
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            //  {console.log("item: ____", item.photo)}
-            // <View style={styles.item}>
-            <View>
-              <Card>
-                <Card.Title>Title: {item.subject}</Card.Title>
-                <Card.Divider />
-                <TouchableOpacity
-                  key={item.id}
-                  onPress={() => toggleModal(item.imageUser)}
-                >
-                  <Card.Image
-                    style={{ padding: 0 }}
-                    source={{
-                      uri: item.imageUser,
-                    }}
-                  />
-                </TouchableOpacity>
-                <Modal
-                  visible={isModalVisible}
-                  transparent={true}
-                  onRequestClose={toggleModal}
-                >
-                  <View style={styles.modalContainer}>
-                    {/* Imagen en pantalla completa */}
-                    {imageModal && (
-                      <Image
-                        source={{ uri: imageModal }}
-                        style={styles.fullImage}
-                        resizeMode="contain"
-                      />
-                    
-                    )}
+      <SafeAreaView
+        style={
+          styles.container
+          // {
 
-                    {/* Botón de cerrar */}
-
-                    <TouchableOpacity
-                      onPress={() => setModalVisible(false)}
-                      style={styles.closeButton}
-                    >
-                      <Text style={styles.closeButtonText}>Close</Text>
-                    </TouchableOpacity>
-                  </View>
-                </Modal>
-
-                <Text style={{ marginBottom: 10 }}>
-                  Photo Name: {item.photoName}
-                </Text>
-                <Text style={{ marginBottom: 10 }}>
-                  Message: {item.message}
-                </Text>
-                <Text style={{ marginBottom: 10 }}>
-                  Time: {item.timeSubject}
-                </Text>
-                <Card.Divider />
-                <View style={{flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start',flexDirection: 'row',}}>
-                <Icon
-                  name="delete"
-                  color="black"
-                  onPress={() => handleDelete(item.id)}
-                />
-                </View>
-              </Card>
-            </View>
-          )}
-        />
-      </View>
-
-          {/* BOTON DE ABRIR EL MODAL PARA CARGAR IMAGENES */}
-      <View>
-        <FAB
-          onPress={() => handleSnapPress(0)}
-          placement="right"
-          icon={{ name: 'add', color: 'white' }}
-          color="#517fa4"
-        />
-      </View>
-        
-          {/* ACA SE ABRE EL MODAL PARA CARGAR IMAGENES */}
-        
-      <BottomSheet
-        ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        enablePanDownToClose={true}
-        index={-1}
-        // onClose={() => setIsOpen(false)}
-        // onPress={handleClose}
+          // marginTop: StatusBar.currentHeight
+          // }
+        }
       >
-        <BottomSheetView style={styles.container}>
-          <View>
-            <ButtonComponent
+        {email ? <Text>Welcome, {email.email}</Text> : <Text>Cargando...</Text>}
+
+        <View>
+          <FlatList
+            contentContainerStyle={{ minHeight: screenHeight }}
+            data={data} // Pasamos los datos a la lista
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              //  {console.log("item: ____", item.photo)}
+              // <View style={styles.item}>
+              <View>
+                <Card>
+                  <Card.Title>Title: {item.subject}</Card.Title>
+                  <Card.Divider />
+                  <TouchableOpacity
+                    key={item.id}
+                    onPress={() => toggleModal(item.imageUser)}
+                  >
+                    <Card.Image
+                      style={{ padding: 0 }}
+                      source={{
+                        uri: item.imageUser,
+                      }}
+                    />
+                  </TouchableOpacity>
+                  <Modal
+                    visible={isModalVisible}
+                    transparent={true}
+                    onRequestClose={toggleModal}
+                  >
+                    <View style={styles.modalContainer}>
+                      {/* Imagen en pantalla completa */}
+                      {imageModal && (
+                        <Image
+                          source={{ uri: imageModal }}
+                          style={styles.fullImage}
+                          resizeMode="contain"
+                        />
+                      )}
+
+                      {/* Botón de cerrar */}
+
+                      <TouchableOpacity
+                        onPress={() => setModalVisible(false)}
+                        style={styles.closeButton}
+                      >
+                        <Text style={styles.closeButtonText}>Close</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </Modal>
+
+                  <Text style={{ marginBottom: 10 }}>
+                    Photo Name: {item.photoName}
+                  </Text>
+                  <Text style={{ marginBottom: 10 }}>
+                    Message: {item.message}
+                  </Text>
+                  <Text style={{ marginBottom: 10 }}>
+                    Time: {item.timeSubject}
+                  </Text>
+                  <Card.Divider />
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      flexDirection: 'row',
+                    }}
+                  >
+                    <Icon
+                      name="delete"
+                      color="black"
+                      onPress={() => handleDelete(item.id)}
+                    />
+                  </View>
+                </Card>
+              </View>
+            )}
+          />
+        </View>
+
+        {/* BOTON DE ABRIR EL MODAL PARA CARGAR IMAGENES */}
+
+
+        <View>
+          <FAB
+            onPress={() => handleSnapPress(0)}
+            placement="right"
+            icon={{ name: 'add', color: 'white' }}
+            color="#517fa4"
+          />
+        </View>
+
+        {/* ACA SE ABRE EL MODAL PARA CARGAR IMAGENES */}
+
+        <BottomSheet
+          ref={bottomSheetRef}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          index={-1}
+          // onClose={() => setIsOpen(false)}
+          // onPress={handleClose}
+        >
+          <BottomSheetView >
+           <View >
+           <ButtonComponent
               theme="primary"
               label="Choose a photo"
               onPress={pickImageAsync}
             />
-          </View>
-          <View style={styles.inputGroup}>
-            <TextInput
-              displayType="text"
-              placeholder="Subject"
-              value={subject}
-              onChangeText={(value) => setSubject(value)}
-            />
-          </View>
-          <View style={styles.inputGroup}>
-            <TextInput
-              displayType="text"
-              placeholder="Message"
-              value={message}
-              onChangeText={(value) => setMessage(value)}
-            />
-          </View>
-          <View>
-            <Button title="Send subjects" onPress={handleSubmit} />
-          </View>
+           </View>
 
-          <View style={styles.imageContainer}>
-            <ImageViewer
-              placeholderImageSource={'PlaceholderImage'}
-              selectedImage={selectedImage}
-            />
-          </View>
-        </BottomSheetView>
-      </BottomSheet>
-    </SafeAreaView>
+            <View style={styles.inputGroup}>
+              <TextInput
+                displayType="text"
+                placeholder="Subject"
+                value={subject}
+                onChangeText={(value) => setSubject(value)}
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <TextInput
+                displayType="text"
+                placeholder="Message"
+                value={message}
+                onChangeText={(value) => setMessage(value)}
+              />
+            </View>
+            <View>
+              <Button title="Send subjects" onPress={handleSubmit} />
+            </View>
+
+            <View style={styles.imageContainer}>
+              <ImageViewer
+                placeholderImageSource={'PlaceholderImage'}
+                selectedImage={selectedImage}
+              />
+            </View>
+          </BottomSheetView>
+        </BottomSheet>
+      </SafeAreaView>
+        </GestureHandlerRootView>
+    </>
   )
 }
 
