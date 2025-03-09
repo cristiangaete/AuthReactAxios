@@ -45,6 +45,14 @@ const MyDrawer = ({ navigation }) => {
           headerShown: true,
         }}
       />
+      <Drawerr.Screen
+        name="Applications Ready"
+        component={ApplicationsReadyScreen}
+        options={{
+          // title: 'Login',
+          headerShown: true,
+        }}
+      />
     </Drawerr.Navigator>
   )
 }

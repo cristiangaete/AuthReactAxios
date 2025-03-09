@@ -55,12 +55,15 @@ export default function ApplicationsReadyScreen() {
       console.log('readyScreen:', dataFetch)
 
       // console.log("user------->", user.userEmail)
-      setData(dataFetch)
       console.log(data)
+      setData(dataFetch)
     } catch (err) {
       console.log('Error al obtener datos del usuario', err)
     }
   }
+  useEffect(() => {
+    fetchUserData()
+  }, [])
 
   const toggleModal = (imageUrl) => {
     // setModalVisible(!isModalVisible)
@@ -69,42 +72,46 @@ export default function ApplicationsReadyScreen() {
     setModalVisible(true)
   }
 
-  useEffect(() => {
-    fetchUserData()
-  }, [])
+  
+
   return (
     <>
       <SafeAreaView style={{ flex: 1, padding: 10 }}>
         <View>
           <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={true}
-          directionalLockEnabled={true}
-          alwaysBounceVertical={false}
+            horizontal
+            showsHorizontalScrollIndicator={true}
+            directionalLockEnabled={true}
+            alwaysBounceVertical={false}
           >
-          <FlatList
-         contentContainerStyle={{alignSelf: 'flex-start'}}
-        //  numColumns={Math.ceil(data.length / 2)}
-         showsVerticalScrollIndicator={false}
-         showsHorizontalScrollIndicator={false}
-          // horizontal={true}
-          // numColumns={2}
-            // contentContainerStyle={{ minHeight: screenHeight }}
-            data={data} // Pasamos los datos a la lista
-            // set number of columns
-            // columnWrapperStyle={{
-            //   row: {
-            //     flex: 1,
-            //     justifyContent: 'space-around',
-            //   },
-            // }}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              //  {console.log("item: ____", item.photo)}
-              // <View style={styles.item}>
-              
-                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                  <Card >
+            <FlatList
+              contentContainerStyle={{ alignSelf: 'flex-start' }}
+              //  numColumns={Math.ceil(data.length / 2)}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+              // horizontal={true}
+              // numColumns={2}
+              // contentContainerStyle={{ minHeight: screenHeight }}
+              data={data} // Pasamos los datos a la lista
+              // set number of columns
+              // columnWrapperStyle={{
+              //   row: {
+              //     flex: 1,
+              //     justifyContent: 'space-around',
+              //   },
+              // }}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                //  {console.log("item: ____", item.photo)}
+                // <View style={styles.item}>
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                  }}
+                >
+                  <Card>
                     <Card.Title>Title: {item.subject}</Card.Title>
                     <Card.Divider />
                     <TouchableOpacity
@@ -205,9 +212,8 @@ export default function ApplicationsReadyScreen() {
                     </Text>
                   </Card>
                 </View>
-              
-            )}
-          />
+              )}
+            />
           </ScrollView>
         </View>
       </SafeAreaView>
